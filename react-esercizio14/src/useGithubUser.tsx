@@ -11,18 +11,32 @@ export function useGithubUser() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  function fetchUser(username: string) {
-    setLoading(true);
-    setError(null);
+  async function fetchUser(username: string) {
+    try {
+      setLoading(true);
+      setError(null);
 
-    fetch(`https://api.github.com/users/${username}`)
-      .then((response) => {
-        if (!response.ok) throw new Error(response.statusText);
-        return response.json();
-      })
-      .then((json) => setUser(json))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      const response = await fetch(`https://api.github.com/users/${username}`);
+
+      if (!response.ok) throw new Error(response.statusText);
+
+      const responseJson = await response.json();
+
+      setUser(responseJson);
+    } catch (error: any) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+
+    //fetch(`https://api.github.com/users/${username}`)
+    // .then((response) => {
+    //  if (!response.ok) throw new Error(response.statusText);
+    //  return response.json();
+    // })
+    // .then((json) => setUser(json))
+    // .catch((err) => setError(err.message))
+    // .finally(() => setLoading(false));
   }
 
   return { user, loading, error, fetchUser };
